@@ -33,7 +33,7 @@ OMLTask = R6Class("OMLTask",
     #' OpenML task id.
     id = NULL,
 
-    #' @template field_cache_dir
+    #' @temulate field_cache_dir
     cache_dir = NULL,
 
     #' @description
@@ -44,7 +44,7 @@ OMLTask = R6Class("OMLTask",
     #' @template param_cache
     initialize = function(id, cache = getOption("mlr3oml.cache", FALSE)) {
       self$id = assert_count(id, coerce = TRUE)
-      self$cache_dir = get_cache_dir(cache)
+      self$cache_dir = get_cache_dir(assert_flag(cache))
       initialize_cache(self$cache_dir)
     },
 
@@ -53,9 +53,34 @@ OMLTask = R6Class("OMLTask",
     #' For a more detailed printer, convert to a [mlr3::Task] via `$task`.
     print = function() {
       catf("<OMLTask:%i:%s> (%ix%i)", self$id, self$name, self$nrow, self$ncol)
+      # catf("<OMLTask:%i>", self$id)
+    },
+
+    #' @description
+    #' Converts a OMLTask to an mlr3 Task.
+    convert = function() {
+      name = self$name
+      data = self$data$data
+      target = self$target_names
+
+      miss = setdiff(target, names(data))
+      if (length(miss)) {
+        stopf("Task %i could not be created: target '%s' not found in data", self$id, miss[1L])
+      }
+
+      constructor = switch(self$desc$task_type,
+        # FIXME: positive class?
+        "Supervised Classification" = new_task_classif,
+        "Supervised Regression" = new_task_regr,
+        "Survival Analysis" = new_task_surv,
+        stopf("Unsupported task type '%s'", self$desc$task_type)
+      )
+      task = constructor(name, data, target = target)
+      task$backend$hash = sprintf("mlr3oml::task_%i", self$id)
+      task$.__enclos_env__$private$oml_id = self$id
+      task
     }
   ),
-
   active = list(
     #' @field name (`character(1)`)\cr
     #'   Name of the task, as extracted from the task description.
@@ -63,12 +88,17 @@ OMLTask = R6Class("OMLTask",
       self$desc$task_name
     },
 
+    task_type = function() {
+      self$desc$task_type
+    },
+
+
     #' @field desc (`list()`)\cr
     #'   Task description (meta information), downloaded and converted from the JSON API response.
     desc = function() {
       if (is.null(private$.desc)) {
         private$.desc = cached(download_task_desc, "task_desc", self$id, cache_dir = self$cache_dir)
-     }
+      }
 
       private$.desc
     },
@@ -83,7 +113,7 @@ OMLTask = R6Class("OMLTask",
     #' Access to the underlying OpenML data set via a [OMLData] object.
     data = function() {
       if (is.null(private$.data)) {
-        private$.data = OMLData$new(self$data_id, cache = self$cache_dir)
+        private$.data = OMLData$new(self$data_id, cache = is.character(self$cache_dir))
       }
 
       private$.data
@@ -106,7 +136,7 @@ OMLTask = R6Class("OMLTask",
     target_names = function() {
       source_data = self$desc$input$source_data
       targets = switch(self$desc$task_type,
-        "Supervised Classification" =,
+        "Supervised Classification" = ,
         "Supervised Regression" = source_data$target_feature,
         "Survival Analysis" = unlist(source_data[c("target_feature_left", "target_feature_right", "target_feature_event")], use.names = FALSE),
         stopf("Unsupoorted task type '%s'", self$desc$task_type)
@@ -138,7 +168,7 @@ OMLTask = R6Class("OMLTask",
         "Supervised Classification" = new_task_classif,
         "Supervised Regression" = new_task_regr,
         "Survival Analysis" = new_task_surv,
-        stopf("Unsupoorted task type '%s'", self$desc$task_type)
+        stopf("Unsupported task type '%s'", self$desc$task_type)
       )
       task = constructor(name, data, target = target)
       task$backend$hash = sprintf("mlr3oml::task_%i", self$id)
@@ -149,15 +179,7 @@ OMLTask = R6Class("OMLTask",
     #' Creates a [ResamplingCustom][mlr3::mlr_resamplings_custom] using the target attribute of the task description.
     resampling = function() {
       if (is.null(private$.resampling)) {
-        type = NULL
-        splits = cached(download_task_splits, "task_splits", self$id, self$desc, cache_dir = self$cache_dir)
-        train_sets = splits[type == "TRAIN", list(row_id = list(as.integer(rowid) + 1L)),
-          keyby = c("repeat.", "fold")]$row_id
-        test_sets = splits[type == "TEST", list(row_id = list(as.integer(rowid) + 1L)),
-          keyby = c("repeat.", "fold")]$row_id
-
-        resampling = mlr3::ResamplingCustom$new()
-        private$.resampling = resampling$instantiate(self$task, train_sets = train_sets, test_sets = test_sets)
+        private$.resampling = OMLResampling$new(task = self, cache = is.character(self$cache_dir))
       }
 
       private$.resampling
@@ -169,7 +191,6 @@ OMLTask = R6Class("OMLTask",
       self$desc$tag
     }
   ),
-
   private = list(
     .data = NULL,
     .desc = NULL,

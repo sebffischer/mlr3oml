@@ -60,6 +60,10 @@ OMLData = R6Class("OMLData",
     print = function() {
       catf("<OMLData:%i:%s> (%ix%i)", self$id, self$name, self$nrow, self$ncol)
     },
+    convert = function() {
+      stop("Not implemented yet")
+      # TODO: Implement
+    },
 
     #' @description
     #' Returns the value of a single OpenML data set quality.
@@ -106,7 +110,6 @@ OMLData = R6Class("OMLData",
       constructor(self$name, self$data, target = target)
     }
   ),
-
   active = list(
     #' @field name (`character(1)`)\cr
     #' Name of the data set, as extracted from the data set description.
@@ -119,7 +122,7 @@ OMLData = R6Class("OMLData",
     desc = function() {
       if (is.null(private$.desc)) {
         private$.desc = cached(download_data_desc, "data_desc", self$id, cache_dir = self$cache_dir)
-     }
+      }
       private$.desc
     },
 
@@ -149,7 +152,8 @@ OMLData = R6Class("OMLData",
     features = function() {
       if (is.null(private$.features)) {
         private$.features = cached(download_data_features, "data_features", self$id,
-          desc = self$desc, cache_dir = self$cache_dir)
+          desc = self$desc, cache_dir = self$cache_dir
+        )
       }
 
       private$.features
@@ -197,7 +201,6 @@ OMLData = R6Class("OMLData",
       self$desc$tag
     }
   ),
-
   private = list(
     .data = NULL,
     .desc = NULL,

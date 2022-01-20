@@ -12,11 +12,13 @@ CACHE$versions = list(
 CACHE$initialized = character()
 
 get_cache_dir = function(cache) {
-  if (isFALSE(cache))
+  if (isFALSE(cache)) {
     return(FALSE)
+  }
 
-  if (isTRUE(cache))
+  if (isTRUE(cache)) {
     cache = R_user_dir("mlr3oml", "cache")
+  }
 
   assert(check_directory_exists(cache), check_path_for_output(cache))
   normalizePath(cache, mustWork = FALSE)
@@ -60,19 +62,39 @@ initialize_cache = function(cache_dir) {
   return(TRUE)
 }
 
+#' @title Cached
+#'
+#' @name cached
+#'
+#' @description
+#' This function
+#'
+#' @param fun
+#' Download function
+#'
+#' @param type
+#' The type that is downloaded, not really necessary
+#'
+
+
 cached = function(fun, type, id, ..., cache_dir = FALSE) {
   if (isFALSE(cache_dir)) {
     return(fun(id, ...))
   }
 
   path = file.path(cache_dir, type)
-  file = file.path(path, sprintf("%i.qs", id))
+  if (is.integer(id)) {
+    file = file.path(path, sprintf("%i.qs", id))
+  } else { # url is passed as id
+    file = file.path(path, url_to_filename(id))
+  }
 
   if (file.exists(file)) {
     lg$debug("Loading object from cache", type = type, id = id, file = file)
     obj = try(qs::qread(file, nthreads = getOption("Ncpus", 1L)))
-    if (!inherits(obj, "try-error"))
+    if (!inherits(obj, "try-error")) {
       return(obj)
+    }
     lg$debug("Failed to retrieve object from cache", type = type, id = id, file = file)
   }
 
@@ -85,4 +107,12 @@ cached = function(fun, type, id, ..., cache_dir = FALSE) {
   qs::qsave(obj, file = file, nthreads = getOption("Ncpus", 1L))
 
   return(obj)
+}
+
+url_to_filename = function(url) {
+  url = "https://www.openml.org/data/download/86/weka_generated_predictions.arff"
+  name = gsub("https://www.openml.org/data/download/", "", url)
+  name = gsub(".arff", "", url)
+  name = gsub("/", "_", url)
+  return(name)
 }

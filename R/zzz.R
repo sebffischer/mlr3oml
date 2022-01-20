@@ -36,6 +36,14 @@
   mlr3::mlr_tasks$add("oml", OMLTaskConnector)
   mlr3::mlr_resamplings$add("oml", OMLResamplingConnector)
 
+  # We use this
+
+  mlr3::Learner$set("private", "oml_id", NULL, overwrite = TRUE)
+  mlr3::Task$set("private", "oml_id", NULL, overwrite = TRUE)
+  mlr3::Resampling$set("private", "oml_id", NULL, overwrite = TRUE)
+  mlr3::ResampleResult$set("private", "oml_id", NULL, overwrite = TRUE)
+  mlr3::BenchmarkResult$set("private", "oml_id", NULL, overwrite = TRUE)
+
   # setup logger
   assign("lg", lgr::get_logger(pkgname), envir = parent.env(environment()))
   if (Sys.getenv("IN_PKGDOWN") == "true") {
@@ -45,8 +53,13 @@
   utils::globalVariables(c("is_target", "is_ignore", "is_row_identifier"), pkgname)
 } # nocov end
 
-.onUnload <- function (libpath) { # nolint
+.onUnload = function(libpath) { # nolint
   # nocov start
+  mlr3::Task$private_fields$oml_id = NULL
+  mlr3::Learner$private_fields$oml_id = NULL
+  mlr3::Resampling$private_fields$oml_id = NULL
+  mlr3::ResampleResult$private_fields$oml_id = NULL
+  mlr3::BenchmarkResult$private_fields$oml_id = NULL
   library.dynam.unload("mlr3oml", libpath)
 } # nocov end
 
