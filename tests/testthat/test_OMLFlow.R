@@ -41,12 +41,22 @@ test_that("Autotest download", {
   }
 })
 
-test_that("Can reconstruct regr.rpart", {
+test_that("Can publish and download classif.rpart", {
   with_test_server()
-  withr::defer(delete("flow", flow_id))
-  learner = mlr3::lrn("regr.rpart")
+  withr::defer(delete("flow", flow_id, confirm = FALSE))
+  learner = mlr3::lrn("classif.rpart")
   flow_id = publish(learner, confirm = FALSE)
   flow = OMLFlow$new(flow_id)
   expect_oml_flow(flow)
   expect_equal(learner, flow$convert())
 })
+
+test_that("Publish works correctly when learner is already published",
+  with_test_server()
+  withr::defer(delete("flow", flow_id, confirm = FALSE))
+  learner = mlr3::lrn("regr.rpart")
+  debugonce(publish)
+  flow_id = publish(learner, confirm = FALSE)
+  flow_id_second = publish(learner, confirm = FALSE)
+  expect_equal(flow_id, flow_id_second)
+)

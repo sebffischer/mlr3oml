@@ -6,18 +6,8 @@
 #' This is a generic function.
 #' @export
 publish = function(x, confirm = TRUE, ...) {
-  # TODO: remove this when package is ready
-  # if (get_server() != "https://test.openml.org/api/v1") {
-
   if (confirm) {
     ask_confirmation()
-  }
-
-  if (TRUE) {
-    id = query_existance(x)
-    if (!is.null(id)) { # nolint
-      return(id)
-    }
   }
   id = UseMethod("publish", x)
   get_private(x)$oml_id = id
@@ -62,9 +52,8 @@ publish.Learner = function(x, ...) { # nolint
     )
   )
 
-  mlr3misc::messagef("Your flow was successfully uploaded and assigned id: %i.", id)
 
-  return(flow_id)
+  return(id)
 }
 
 publish.Task = function(x, resampling, ...) { # nolint

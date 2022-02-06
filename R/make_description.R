@@ -11,12 +11,12 @@ make_description.default = function(x, ...) { # nolint
 
 #' @export
 make_description.Learner = function(x, ...) { # nolint
-  name = sprintf("mlr3.%s_test", x$id)
+  name = sprintf("mlr3.%s", x$id)
   external_version = paste0(x$hash, "_test") # FIXME: remove this when new version is released
   dependencies = get_dependencies(x$packages)
   # TODO: remove this
   description = sprintf(
-    "[TEST]: Learner %s from package(s) %s.", x$id,
+    "Learner %s from package(s) %s.", x$id,
     paste(x$packages, collapse = ", ")
   )
   ps = as.data.table(x$param_set)

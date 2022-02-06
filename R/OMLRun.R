@@ -5,7 +5,7 @@
 #'
 #' @section mlr3 Integration:
 #' A [mlr3oml::OMLTask] is returned by the active field `$task`.
-#' A [mlr3oml::OMLData] is returned by the active field `$data` (short for $task$data)
+#' A [mlr3oml::OMLData] is returned by the active field `$data` (short for $task$data).
 #' A [mlr3oml::OMLFlow] is returned by the active field `$flow`.
 #'
 #' @references
@@ -16,11 +16,10 @@
 #' \donttest{
 #' oml_run = OMLRun$new(id = 1)
 #'
-#' print(oml_run)
 #' print(oml_run$task) # OMLTask
 #' print(oml_run$data) # OMLData
 #' print(oml_run$flow) # OMLFlow
-#' print(oml_run$resampling) # OMLFlow
+#' print(oml_run$resampling) # OMLResampling
 #' }
 #'
 OMLRun = R6Class("OMLRun",
