@@ -40,7 +40,7 @@ OMLFlow = R6Class("OMLFlow",
           return(NULL)
         }
       )
-      get_private(learner)$oml_id = self$id
+      learner$.__enclos_env__$private$oml_id = self$id
       return(learner)
     },
 

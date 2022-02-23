@@ -10,7 +10,8 @@ publish = function(x, confirm = TRUE, ...) {
     ask_confirmation()
   }
   id = UseMethod("publish", x)
-  get_private(x)$oml_id = id
+  # get_private(x)$oml_id = id
+  x$.__enclos_env__$private$oml_id = id
   return(id)
 }
 
@@ -97,7 +98,7 @@ publish.ResampleResult = function(x, ...) { # nolint
   # of the flow
   saveRDS(states, states_path)
 
-  id = upload(
+  run_id = upload(
     url = url,
     body = list(
       description = httr::upload_file(desc_path),
@@ -105,9 +106,7 @@ publish.ResampleResult = function(x, ...) { # nolint
       binary = httr::upload_file(states_path)
     )
   )
-  messagef("Your run was successfully uploaded and assigned id: %i.", id)
-  output = list(run_id = run_id, flow_id = flow_id, task_id = task_id)
-  return(output)
+  return(list(run_id = run_id, flow_id = flow_id, task_id = task_id))
 }
 
 

@@ -233,7 +233,10 @@ upload = function(url, body, query = list(api_key = get_api_key())) {
       stop(xml2::as_list(httr::content(response))$error$message %??% "Unknown error")
     }
   } else {
-    id = as.integer(content_list$upload_flow$id[[1]])
+    id = switch(tolower(type),
+      flow = as.integer(content_list$upload_flow$id[[1]]),
+      run = as.integer(content_list$upload_run$run_id[[1]])
+    )
     mlr3misc::messagef("Your %s was successfully uploaded and assigned id: %i.", type, id)
   }
 

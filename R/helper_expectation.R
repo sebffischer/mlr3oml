@@ -115,8 +115,23 @@ expect_oml_task = function(oml_task) {
 
 expect_oml_run = make_expect(function(run) {
   expect_r6(run, "OMLRun")
-  expect_integer(run$id)
-  expect_posixct(run$upload_date)
-  expect_string(run$description)
+  expect_character(run, null.ok = TRUE)
+  expect_r6(run, "OMLTask")
+  expect_list(run$desc)
   expect_data_table(run$prediction)
+  expect_choice(run$task_type,
+    c("Supervised Regression",
+      "Supervised Classification",
+      "Survival Analysis"
+    )
+  )
+  expect_int(run$task_id)
+  expect_data_table(run$parameter_setting)
+  expect_r6(run$data, "OMLData")
+  expect_int(run$data_id)
+  expect_r6(run$flow, "OMLFlow")
+  expect_int(run$flow_id)
+  expect_int(run$id)
+  expect_r6(run$data, "OMLData")
+  expect_data_table(run$evaluation)
 })

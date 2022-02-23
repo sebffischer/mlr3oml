@@ -1,12 +1,7 @@
 #' @title Interface to OpenML Runs
 #'
 #' @description
-#' This is the class for tasks provided on \url{https://openml.org/}.
-#'
-#' @section mlr3 Integration:
-#' A [mlr3oml::OMLTask] is returned by the active field `$task`.
-#' A [mlr3oml::OMLData] is returned by the active field `$data` (short for $task$data).
-#' A [mlr3oml::OMLFlow] is returned by the active field `$flow`.
+#' This is the class for tasks provided on \url{https://new.openml.org/search?type=run}.
 #'
 #' @references
 #' `r format_bib("vanschoren2014")`
@@ -19,7 +14,6 @@
 #' print(oml_run$task) # OMLTask
 #' print(oml_run$data) # OMLData
 #' print(oml_run$flow) # OMLFlow
-#' print(oml_run$resampling) # OMLResampling
 #' }
 #'
 OMLRun = R6Class("OMLRun",
@@ -170,11 +164,15 @@ OMLRun = R6Class("OMLRun",
 
 
 split_predictions = function(predictions, resampling, task_type) {
-  # classes = switch(task_type,
-  #   "classif" = c("PredictionDataClassif", "PredictionData"),
-  #   "regr" = c("PredictionDataRegr", "PredictionData")
-  # )
-  classes = c("PredictionDataClassif", "PredictionData")
+  if (task_type == "Supervised Classification") {
+    classes = c("PredictionDataClassif", "PredictionData")
+  }
+  if (task_type == "Supervised Regression") {
+    classes = c("PredictionDataRegr", "PredictionData")
+  }
+  # if (task_type == "Survival Analysis") {
+  #   classes = c("PredictionDataSurv", "PredictionData")
+  # }
   predictions = lapply(
     resampling$instance$test,
     function(x) {

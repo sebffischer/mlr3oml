@@ -139,7 +139,7 @@ OMLTask = R6Class("OMLTask",
         "Supervised Classification" = ,
         "Supervised Regression" = source_data$target_feature,
         "Survival Analysis" = unlist(source_data[c("target_feature_left", "target_feature_right", "target_feature_event")], use.names = FALSE),
-        stopf("Unsupoorted task type '%s'", self$desc$task_type)
+        stopf("Unsupported task type '%s'", self$desc$task_type)
       )
 
       make.names(targets)

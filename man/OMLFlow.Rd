@@ -4,11 +4,12 @@
 \alias{OMLFlow}
 \title{Interface to OpenML Flows}
 \description{
-This is the class for flows provided on the \href{https://new.openml.org/search?type=flow&sort=runs}{OpenML website}.
+This is the class for flows provided on the \href{https://new.openml.org/search?type=flow}{OpenML website}.
 }
 \examples{
 \donttest{
-flow = OMLFlow$new(id = 1)
+flow = OMLFlow$new(id = 19068)
+learner = flow$convert()
 }
 }
 \references{
@@ -77,7 +78,7 @@ Initializes a new object of class \link{OMLFlow}.
 \if{html}{\out{<a id="method-convert"></a>}}
 \if{latex}{\out{\hypertarget{method-convert}{}}}
 \subsection{Method \code{convert()}}{
-Tries to convert the OMLFlow into an \link[mlr3:Learner]{mlr3::Learner} if the name starts with mlr3.
+Returns the learner object if the binary rds file is available.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{OMLFlow$convert()}\if{html}{\out{</div>}}
 }

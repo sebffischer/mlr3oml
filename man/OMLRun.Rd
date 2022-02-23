@@ -4,24 +4,15 @@
 \alias{OMLRun}
 \title{Interface to OpenML Runs}
 \description{
-This is the class for tasks provided on \url{https://openml.org/}.
+This is the class for tasks provided on \url{https://new.openml.org/search?type=run}.
 }
-\section{mlr3 Integration}{
-
-A \link{OMLTask} is returned by the active field \verb{$task}.
-A \link{OMLData} is returned by the active field \verb{$data} (short for $task$data)
-A \link{OMLFlow} is returned by the active field \verb{$flow}.
-}
-
 \examples{
 \donttest{
 oml_run = OMLRun$new(id = 1)
 
-print(oml_run)
 print(oml_run$task) # OMLTask
 print(oml_run$data) # OMLData
 print(oml_run$flow) # OMLFlow
-print(oml_run$resampling) # OMLFlow
 }
 
 }
